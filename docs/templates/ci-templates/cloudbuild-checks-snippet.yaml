@@ -1,0 +1,250 @@
+# Canonical CI checks snippet — lint · style · type · test
+#
+# Copy this file to cloud-build/cloudbuild-checks.yaml in the customer
+# repo and wire a Cloud Build trigger from Terraform (see README.md for
+# the full setup guide and the /setup-ci skill for automation).
+#
+# SWAP points are marked with "# SWAP:" — edit only those for a
+# non-house-stack repo.
+#
+# House stack: pnpm 10.28.2 · Turborepo 2.8.20 · Node 24
+# Style gate:  pnpm format:check (ESLint @stylistic alias of pnpm lint).
+#              SWAP: replace with `biome check .` or `prettier --check .`
+#              when adopting a dedicated formatter.
+
+steps:
+  # Compute a content-addressed cache key from the three files that affect
+  # installed dependencies and build graph: lockfile + turbo config + root
+  # package.json. Same inputs = cache hit; any change = new key.
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: compute-cache-key
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        set -e
+        key="$(cat pnpm-lock.yaml turbo.json package.json | sha256sum | cut -c1-16)"
+        echo "$key" > /workspace/cache-key.txt
+        echo "Cache key: $key"
+    waitFor: ["-"]
+
+  # Restore the GCS-backed turbo/pnpm cache. Tries the exact-match key
+  # first, then falls back to the most-recent "latest" snapshot.
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: restore-cache
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        set -e
+        key="$(cat /workspace/cache-key.txt)"
+        bucket="gs://${_CACHE_BUCKET}"  # SWAP: set _CACHE_BUCKET substitution below
+        if gsutil -q cp "$bucket/cache-$key.tar.gz" /workspace/.cache.tar.gz 2>/dev/null; then
+          echo "Cache hit: cache-$key.tar.gz"
+        elif gsutil -q cp "$bucket/cache-latest.tar.gz" /workspace/.cache.tar.gz 2>/dev/null; then
+          echo "Cache fallback: cache-latest.tar.gz"
+        else
+          echo "No cache found; starting fresh"
+          exit 0
+        fi
+        tar -xzf /workspace/.cache.tar.gz -C /workspace
+        rm /workspace/.cache.tar.gz
+    waitFor: ["compute-cache-key"]
+
+  # Classify the PR diff as docs / content / terraform / full so expensive
+  # steps can early-exit for non-code changes (~30 s vs ~10 min).
+  # Runs before install — needs only bun and git, no node_modules.
+  - name: "oven/bun:1"
+    id: detect-scope
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        apt-get update -qq && apt-get install -y -q git > /dev/null 2>&1
+        git fetch origin main --depth=1 2>/dev/null || true
+        bun packages/scripts/src/ci-change-scope.ts > /workspace/ci-scope.txt
+        echo "CI scope: $(cat /workspace/ci-scope.txt)"
+    waitFor: ["-"]
+
+  - name: "node:24-slim"  # SWAP: node image version
+    id: install
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ]; then echo "Skipping install: docs scope"; exit 0; fi
+        corepack enable
+        for attempt in 1 2; do
+          echo "install attempt $attempt"
+          if timeout 600 bash -c 'corepack prepare pnpm@10.28.2 --activate && pnpm install --frozen-lockfile'; then
+            exit 0
+          fi
+          echo "attempt $attempt failed; retrying"
+        done
+        echo "install failed after 2 attempts"
+        exit 1
+    waitFor: ["restore-cache", "detect-scope"]
+
+  # Build must complete before tsc and test — Turborepo marks them as
+  # dependsOn: ["^build"] so incremental tsbuildinfo and package outputs
+  # must exist. Lint and style do not require build but wait here so the
+  # memory-hungry webpack build does not run alongside them.
+  - name: "node:24-slim"
+    id: build
+    entrypoint: bash
+    secretEnv: [TURBO_TOKEN]
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ]; then echo "Skipping build: docs scope"; exit 0; fi
+        corepack enable
+        corepack prepare pnpm@10.28.2 --activate  # SWAP: pnpm version
+        NATIVE_BUILD=1 pnpm build  # SWAP: remove NATIVE_BUILD if not using Next.js
+    waitFor: ["install"]
+
+  # ── Four checks — run in parallel after build ─────────────────────────
+
+  - name: "node:24-slim"
+    id: lint
+    entrypoint: bash
+    secretEnv: [TURBO_TOKEN]
+    env:
+      - "NODE_OPTIONS=--max-old-space-size=4096"
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ] || [ "$scope" = "content" ] || [ "$scope" = "terraform" ]; then
+          echo "Skipping lint: ${scope} diff"
+          exit 0
+        fi
+        corepack enable
+        corepack prepare pnpm@10.28.2 --activate
+        pnpm lint  # SWAP: npm run lint / yarn lint
+    waitFor: ["detect-scope", "build"]
+
+  # Style is enforced through ESLint @stylistic rules — pnpm format:check
+  # is an alias of pnpm lint. Keeping it as a separate named step preserves
+  # canonical four-check parity and is near-free thanks to Turborepo's cache.
+  # SWAP: replace run command with `biome check .` or `prettier --check .`
+  - name: "node:24-slim"
+    id: style
+    entrypoint: bash
+    secretEnv: [TURBO_TOKEN]
+    env:
+      - "NODE_OPTIONS=--max-old-space-size=4096"
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ] || [ "$scope" = "content" ] || [ "$scope" = "terraform" ]; then
+          echo "Skipping style: ${scope} diff"
+          exit 0
+        fi
+        corepack enable
+        corepack prepare pnpm@10.28.2 --activate
+        pnpm format:check  # SWAP: biome check . / pnpm dlx prettier --check .
+    waitFor: ["detect-scope", "build"]
+
+  - name: "node:24-slim"
+    id: tsc
+    entrypoint: bash
+    secretEnv: [TURBO_TOKEN]
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ] || [ "$scope" = "content" ] || [ "$scope" = "terraform" ]; then
+          echo "Skipping tsc: ${scope} diff"
+          exit 0
+        fi
+        corepack enable
+        corepack prepare pnpm@10.28.2 --activate
+        pnpm tsc  # SWAP: npm run typecheck / tsc --noEmit
+    waitFor: ["detect-scope", "build"]
+
+  - name: "node:24-slim"
+    id: test
+    entrypoint: bash
+    secretEnv: [TURBO_TOKEN]
+    args:
+      - "-c"
+      - |
+        scope="$(cat /workspace/ci-scope.txt)"
+        if [ "$scope" = "docs" ] || [ "$scope" = "content" ] || [ "$scope" = "terraform" ]; then
+          echo "Skipping test: ${scope} diff"
+          exit 0
+        fi
+        # Install bun globally — some packages use bun:test.
+        # SWAP: remove if repo uses only Vitest or only bun test.
+        apt-get update -qq && apt-get install -y -q git python3 > /dev/null 2>&1
+        corepack enable
+        corepack prepare pnpm@10.28.2 --activate
+        npm install -g bun
+        pnpm turbo run test  # SWAP: pnpm test / vitest run / bun test
+    waitFor: ["detect-scope", "build"]
+
+  # Save cache to GCS after all checks finish. Writes both the hash-keyed
+  # artifact (immutable) and cache-latest (fallback for the first build after
+  # a lockfile bump). Must wait for every step that writes to .turbo or
+  # .eslintcache to avoid a tar-while-writing race.
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: save-cache
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        set -e
+        key="$(cat /workspace/cache-key.txt)"
+        bucket="gs://${_CACHE_BUCKET}"
+        cd /workspace
+        paths=""
+        for p in \
+          .pnpm-store \
+          .corepack \
+          .turbo \
+          apps/web/.turbo \
+          apps/web/.eslintcache \
+          packages/mcp-cache/.turbo \
+          packages/personas/.turbo \
+          packages/scripts/.turbo \
+          packages/shared-roadmap/.turbo \
+        ; do
+          [ -e "$p" ] && paths="$paths $p"
+        done
+        if [ -z "$paths" ]; then
+          echo "Nothing to cache"
+          exit 0
+        fi
+        echo "Caching: $paths"
+        tar -czf /workspace/.cache.tar.gz $paths
+        gsutil -q cp /workspace/.cache.tar.gz "$bucket/cache-$key.tar.gz"
+        gsutil -q cp /workspace/.cache.tar.gz "$bucket/cache-latest.tar.gz"
+        echo "Cache saved: cache-$key.tar.gz + cache-latest.tar.gz"
+    waitFor: ["build", "lint", "style", "tsc", "test"]
+
+options:
+  # E2_HIGHCPU_8: cheapest 8-vCPU Cloud Build machine. Do NOT drop to the
+  # default e2-standard-2 (2 vCPU) — that exposes hard timeouts in parallel
+  # test steps and save-cache races. E2_STANDARD_4 is not a valid enum value.
+  machineType: E2_HIGHCPU_8  # SWAP: E2_HIGHCPU_32 for very large monorepos
+  diskSizeGb: 30
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - "npm_config_store_dir=/workspace/.pnpm-store"
+    - "COREPACK_HOME=/workspace/.corepack"
+    - "TURBO_TEAM=monorepo"  # SWAP: your turbo team slug
+    - "TURBO_API=${_TURBO_API}"
+
+timeout: "1800s"
+
+substitutions:
+  _CACHE_BUCKET: ""  # SWAP: set to ${PROJECT_ID}_cloudbuild or your GCS bucket
+  _TURBO_API: ""     # SWAP: set to your Turborepo remote cache URL
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/turbo-cache-token/versions/latest
+      env: TURBO_TOKEN  # SWAP: update secret name if different
