@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-circuit-breaker-rule
-canonical-version: 2026-06-04
+canonical-version: 2026-06-24
 description: Circuit breaker rule for WIP overload recovery
 ---
 
@@ -28,7 +28,7 @@ Killing and re-shaping forces an honest answer: was the appetite wrong? Was the 
 
 ## What "killed" means in practice
 
-`Killed` is the terminal state for an issue stopped mid-execution (circuit breaker triggered). It is distinct from `Rejected`, which applies to issues eliminated at or before the issue review table and never built.
+`Canceled` is the terminal state for any issue stopped before release. It covers issues eliminated at or before the issue review table and issues stopped mid-execution by the circuit breaker.
 
 Anything that is shippable at appetite end ships. If a scope is complete and provides standalone value, it goes out. The remainder is discarded.
 
@@ -45,7 +45,7 @@ When elapsed business days since `Started date` ≥ appetite (read the `Appetite
 /ship-issue <issue-number> --action kill
 ```
 
-This moves the issue to `Killed` in the GitHub Project and closes the GitHub Issue. Any scopes that independently shipped before the kill are noted in the closing comment on the issue.
+This moves the issue to `Canceled` in the GitHub Project and closes the GitHub Issue. Any scopes that independently shipped before the cancellation are noted in the closing comment on the issue.
 
 ## Enforcement
 

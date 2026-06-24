@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-flow-metrics-guide
-canonical-version: 2026-06-04
+canonical-version: 2026-06-24
 description: Flow metrics tracking and interpretation guide
 ---
 
@@ -53,7 +53,7 @@ Run `/flow-metrics` or `bun packages/scripts/src/flow-metrics.ts` each week to c
 
 ### Kill rate
 
-**Definition:** Percentage of issues that entered `In progress` and were killed (moved to the `Killed` column in the GitHub Project) rather than shipped.
+**Definition:** Percentage of issues that entered `In progress` and were killed (moved to the `Canceled` column in the GitHub Project) rather than shipped.
 
 **Unit:** percentage.
 

@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-adoption-checklist
-canonical-version: 2026-06-20
+canonical-version: 2026-06-24
 description: Shaped Kanban adoption checklist for new teams
 ---
 
@@ -49,7 +49,7 @@ Accepted values for `roadmapSystem`: `"gsheets"`, `"notion"`, `"excel"`, `"jira"
 bun run packages/scripts/src/provision-github-project.ts --client <slug> [--dry-run]
 ```
 
-This creates a GitHub Project titled `Shaped Kanban` with the canonical pipeline columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Rejected`, `Killed`), provisions the `Appetite`, `Severity`, `Priority`, and `Effort` project fields, and imports any existing issues from `docs/customers/<slug>/issues.csv`. Run with `--dry-run` first to preview all actions.
+This creates a GitHub Project titled `Shaped Kanban` with the canonical pipeline columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`), provisions the `Appetite`, `Severity`, `Priority`, and `Effort` project fields, and imports any existing issues from `docs/customers/<slug>/issues.csv`. Run with `--dry-run` first to preview all actions. The script also prints the manual steps for the canonical Project views: `Contributors`, `Leadership`, `Roadmap`, and `All issues`.
 
 **tasks.csv.** Create the following file in the client repository under `docs/` and commit it:
 

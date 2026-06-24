@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-github-coordination-conventions
-canonical-version: 2026-06-16
+canonical-version: 2026-06-24
 description: GitHub branch, PR, and issue coordination conventions
 ---
 
@@ -71,8 +71,7 @@ Each shaped issue gets one GitHub Issue (created via `/shape` using the `shaped-
 | `In review`          | In PR review                                |
 | `Merged`      | Merged to main; pending release                    |
 | `Shipped`     | Released                                           |
-| `Rejected`           | Killed at or before the issue review table; never built |
-| `Killed`             | Stopped mid-execution; circuit breaker triggered         |
+| `Canceled`           | Stopped before release; covers issue-gate rejection and circuit-breaker cancellation |
 
 Ops-track issues use the same Status column. Use `Severity` (`SEV1`–`SEV4`) to flag incident priority.
 
@@ -111,7 +110,18 @@ bun run packages/scripts/src/create-github-labels.ts --repo <owner/repo> [--with
 
 One permanent GitHub Project for the team. Recommended title: `Shaped Kanban`.
 
-Columns map to pipeline stages: `Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Rejected`, `Killed`.
+Columns map to pipeline stages: `Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`.
+
+Use four canonical Project views:
+
+| View | Layout | Status visibility |
+| ---- | ------ | ----------------- |
+| `Contributors` | Board | Hide `Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, and `Canceled` |
+| `Leadership` | Board | Show all Status columns |
+| `Roadmap` | Timeline | Show all Status columns |
+| `All issues` | Table/list | Show all Status columns |
+
+The provisioning script prints the manual steps for this view setup because GitHub's current public Project APIs do not expose reliable mutations for view ordering or hidden board columns.
 
 Project fields provisioned by `bun run packages/scripts/src/provision-github-project.ts`:
 

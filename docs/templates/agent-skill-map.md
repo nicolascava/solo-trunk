@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-agent-skill-map
-canonical-version: 2026-06-22
+canonical-version: 2026-06-24
 description: Agent skill-to-task mapping reference
 ---
 
@@ -38,9 +38,9 @@ This document maps each Shaped Kanban phase to the Claude Code command that driv
 | Post daily async update | `/daily-standup` (client-facing) · [daily-status-update-guide.md](daily-status-update-guide.md) (internal 3P) | exists | issues, scope Issues; `git` history for client variant | status comment on issue; 3P message posted in `#daily-status` |
 | Sync scope Issues | `/update-issues` | exists | GitHub Issues | GitHub Issues (status updates) |
 | Open a PR for a scope | `/pr` | exists | current branch diff | GitHub PR |
-| Ship or kill an issue | `/ship-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves to Shipped/Killed), GitHub Issue (closed) |
+| Ship or kill an issue | `/ship-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves to Shipped/Canceled), GitHub Issue (closed) |
 | Close an already-solved issue | `/close-solved-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves to Shipped), GitHub Issue (closed) |
-| Compute flow metrics | `/flow-metrics` | exists | GitHub Issues (Done/Killed via `gh`) | none (advisory output) |
+| Compute flow metrics | `/flow-metrics` | exists | GitHub Issues (Shipped/Canceled via `gh`) | none (advisory output) |
 | Run retrospective | `/retro` | exists | `git` log, PR history | retrospective doc in `docs/retros/` |
 | Triage stakeholder feedback | `/create-issue` | exists | scanner output, external roadmap, `client.json` | external roadmap (new row), GitHub Issues (native issue type via `set-issue-type.ts`), scanner reaction or triage note |
 | Classify a GitHub Issue for scheduling | `/triage` | exists | GitHub Issue, GitHub Project | GitHub Project (`Priority`, `Effort`, and `Impact` fields); GitHub Issue (native issue type via `set-issue-type.ts`) |

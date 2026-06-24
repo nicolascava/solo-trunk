@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-shaped-kanban-overview
-canonical-version: 2026-06-22
+canonical-version: 2026-06-24
 description: One-page Shaped Kanban framework reference
 ---
 
@@ -33,8 +33,7 @@ There is no build cycle. Each issue is a self-contained unit with its own appeti
 
 ```
 Triage → Ready to be shaped → Being shaped → Shaped → Ready to work → In progress → In review → Merged → Shipped
-                                                                                                          ↘ Rejected
-                                                                                              ↘ Killed
+                                                                                                          ↘ Canceled
 ```
 
 | Stage | Meaning |
@@ -48,8 +47,7 @@ Triage → Ready to be shaped → Being shaped → Shaped → Ready to work → 
 | `In review` | Work done, awaiting review/QA. WIP-limited. |
 | `Merged` | Merged, awaiting deploy. |
 | `Shipped` | Deployed and live. |
-| `Rejected` | Killed before or during issue review; never built. Can be re-triaged. |
-| `Killed` | Circuit breaker fired mid-execution. Not shipped. Can be re-pitched. |
+| `Canceled` | Stopped before release. May be re-triaged or re-pitched later. |
 
 All pipeline state lives in the GitHub Project board. The customer's external roadmap (Google Sheets, Notion, or Excel, configured in `client.json`) is the source of truth for prioritization.
 
