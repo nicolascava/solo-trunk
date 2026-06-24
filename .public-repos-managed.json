@@ -1,6 +1,14 @@
 {
+  "managedRoots": [
+    "docs/templates",
+    "templates"
+  ],
+  "cleanupRoots": [
+    ".claude"
+  ],
   "scaffoldDestinations": [
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CONTRIBUTING.md"
   ]
 }
