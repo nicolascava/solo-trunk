@@ -55,6 +55,8 @@ Run `/flow-metrics` or `bun packages/scripts/src/flow-metrics.ts` each week to c
 
 **Definition:** Percentage of issues that entered `In progress` and were killed (moved to the `Canceled` column in the GitHub Project) rather than shipped.
 
+Only `Canceled` issues with a `Killed date` count toward kill rate. Pre-build cancellations use the same terminal `Canceled` Status but should not receive a `Killed date`.
+
 **Unit:** percentage.
 
 **Why it matters:** Kill rate measures the circuit breaker's effectiveness. A kill rate that is too low (< 5%) suggests the circuit breaker is not being applied consistently. A kill rate that is too high (> 20%) suggests appetites are systematically too small or issues are entering `In progress` under-shaped.

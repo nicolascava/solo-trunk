@@ -28,7 +28,7 @@ Killing and re-shaping forces an honest answer: was the appetite wrong? Was the 
 
 ## What "killed" means in practice
 
-`Canceled` is the terminal state for any issue stopped before release. It covers issues eliminated at or before the issue review table and issues stopped mid-execution by the circuit breaker.
+`Canceled` is the terminal state for any issue stopped before release. It covers issues eliminated at or before the issue review table and issues stopped mid-execution by the circuit breaker. Only issues that reached `In progress` and were stopped by the circuit breaker receive a `Killed date`; pre-build cancellations do not.
 
 Anything that is shippable at appetite end ships. If a scope is complete and provides standalone value, it goes out. The remainder is discarded.
 
@@ -39,7 +39,7 @@ Specifically:
 
 ## How to apply the circuit breaker
 
-When elapsed business days since `Started date` ≥ appetite (read the `Appetite` Number project field (1–5) and `Start date` from the GitHub Project; the clock is set automatically when a draft PR with `Closes #<issue>` is opened):
+When elapsed business days since `Started date` ≥ appetite (read the `Issue size (days)` Number project field (1–5) and `Start date` from the GitHub Project; the clock is set automatically when a draft PR with `Closes #<issue>` is opened):
 
 ```bash
 /ship-issue <issue-number> --action kill

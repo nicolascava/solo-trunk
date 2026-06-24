@@ -49,7 +49,7 @@ Accepted values for `roadmapSystem`: `"gsheets"`, `"notion"`, `"excel"`, `"jira"
 bun run packages/scripts/src/provision-github-project.ts --client <slug> [--dry-run]
 ```
 
-This creates a GitHub Project titled `Shaped Kanban` with the canonical pipeline columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`), provisions the `Appetite`, `Severity`, `Priority`, and `Effort` project fields, and imports any existing issues from `docs/customers/<slug>/issues.csv`. Run with `--dry-run` first to preview all actions. The script also prints the manual steps for the canonical Project views: `Contributors`, `Leadership`, `Roadmap`, and `All issues`.
+This creates a GitHub Project titled `Shaped Kanban` with the canonical pipeline columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`), provisions the `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`, and `Rank` project fields, and imports any existing issues from `docs/customers/<slug>/issues.csv`. Run with `--dry-run` first to preview all actions. The script also prints the manual steps for the canonical Project views: `Contributors`, `Leadership`, `Roadmap`, and `All issues`.
 
 **tasks.csv.** Create the following file in the client repository under `docs/` and commit it:
 
@@ -151,8 +151,8 @@ Run the kickoff session with the builder. See [In-flow workflow guide](in-flow-w
 
 - [ ] All seven required public channels exist in the client's chat workspace
 - [ ] Both CSVs exist in `docs/` with correct header rows (`docs/tasks.csv`, `docs/deferred-findings.csv`)
-- [ ] `Appetite`, `Severity`, `Priority`, and `Effort` project fields exist (run `bun run packages/scripts/src/provision-github-project.ts --dry-run` to verify)
-- [ ] At least one issue is in `Pipeline state=Ready to work` or `Pipeline state=In progress`
+- [ ] `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`, and `Rank` project fields exist (run `bun run packages/scripts/src/provision-github-project.ts --dry-run` to verify)
+- [ ] At least one issue is in Project `Status=Ready to work` or `Status=In progress`
 - [ ] A GitHub Project exists for tracking issues
 - [ ] Every relative link in the client instantiation docs resolves
 - [ ] `bun packages/scripts/src/wip-check.ts --stage build --client <slug>` exits 0 (no WIP violation)

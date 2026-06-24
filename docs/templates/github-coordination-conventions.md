@@ -56,7 +56,7 @@ Each shaped issue gets one GitHub Issue (created via `/shape` using the `shaped-
 
 - **Title:** the issue title (e.g. "Onboarding rework")
 - **Body:** structured content: problem, appetite, solution sketch, rabbit holes, no-gos
-- **Project fields:** `Status` (pipeline column), `Appetite` (Number 1–5), `Start date` (date), `End date` (date), `Severity`
+- **Project fields:** `Status` (pipeline column), `Issue size (days)` (Number 1–5), `Start date` (date), `End date` (date), `Severity`
 
 ### Issue types by project state
 
@@ -77,7 +77,7 @@ Ops-track issues use the same Status column. Use `Severity` (`SEV1`–`SEV4`) to
 
 ### Labels
 
-Issue labels have exactly one purpose: **promoting an issue to the top of the queue**. Every other state dimension (Priority, Severity, Appetite, Effort, Impact, Focused, Status) lives in Project board fields; labels that duplicate those dimensions are noise.
+Issue labels have exactly one purpose: **promoting an issue to the top of the queue**. Every other state dimension (Priority, Severity, Issue size, Effort, Impact, Focused, Status) lives in Project board fields; labels that duplicate those dimensions are noise.
 
 Two canonical issue-promotion labels are defined:
 
@@ -123,11 +123,13 @@ Use four canonical Project views:
 
 The provisioning script prints the manual steps for this view setup because GitHub's current public Project APIs do not expose reliable mutations for view ordering or hidden board columns.
 
+Existing projects with legacy Rejected or Killed Status options must be migrated manually before rerunning provisioning: move or rename those items into `Canceled`, then remove the legacy options. The scripts still read those legacy values as aliases during transition, but new canonical boards should only expose `Canceled`.
+
 Project fields provisioned by `bun run packages/scripts/src/provision-github-project.ts`:
 
 | Field        | Type          | Options                        | Purpose                                                                                                                        |
 | ------------ | ------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `Appetite`   | Number        | 1–5                            | Issue appetite in business days; used for end-date burn calculation                                                            |
+| `Issue size (days)` | Number        | 1–5                            | Issue appetite in business days; used for end-date burn calculation                                                            |
 | `Start date` | Date          | N/A                            | Set by `/start-issue` when the issue is pulled into `In progress`                                                              |
 | `End date`   | Date          | N/A                            | `addBusinessDays(Start date, appetite)`; set by `/start-issue` alongside `Start date`; roadmap endpoint and appetite hard stop |
 | `Severity`   | Single select | `SEV1`, `SEV2`, `SEV3`, `SEV4` | Incident priority for ops-track issues                                                                                         |
