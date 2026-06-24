@@ -9,7 +9,12 @@ Use `/setup-ci` to auto-detect the customer's CI backend and scaffold the right 
 | Google Cloud Build | `cloudbuild-checks-snippet.yaml` | Cloud Build trigger (Terraform) | `client.json` has `gcpProject` |
 | GitHub Actions | `github-actions-checks.yml` | `pull_request` + `merge_group` | GitHub remote, no GCP project |
 
-Both templates run four independent parallel jobs: **lint** (`pnpm lint`), **style** (`pnpm format:check`), **type** (`pnpm tsc`), and **test** (`pnpm turbo run test`). Lines marked `# SWAP:` are the only customisation points for non-house-stack repos.
+Both templates run four independent parallel jobs: **lint**, **style**, **type**, and **test**. The `/setup-ci` skill auto-detects the customer repo's package manager and emits PM-correct run commands — `pnpm lint`, `npm run lint`, `yarn lint`, or `bun run lint` as appropriate. Lines marked `# SWAP:` in the canonical templates document remaining variation points (e.g., image versions, turbo config) but are no longer the primary adaptation mechanism for package manager choice.
+
+> **Auto-generation:** `/setup-ci` calls `packages/scripts/src/setup-ci-checks.ts`
+> to detect the customer's package manager and emit the correct checks file
+> automatically. The `# SWAP:` markers in the canonical templates are inline
+> documentation of variation points, not the adaptation mechanism.
 
 The templates are validated by `packages/scripts/src/validate-ci-check-templates.test.ts` — run `bun test packages/scripts/src/validate-ci-check-templates.test.ts` after copying to confirm structural integrity.
 

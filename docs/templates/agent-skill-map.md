@@ -23,7 +23,7 @@ This document maps each Shaped Kanban phase to the Claude Code command that driv
 
 | Phase | Command | Status | Reads | Writes |
 |-------|-------|--------|-------|--------|
-| Bootstrap CI checks (lint/style/type/test) for a customer repo | `/setup-ci` | exists | `docs/customers/<slug>/client.json`, `git` remote | prints template path + secret commands (no file writes) |
+| Bootstrap CI checks (lint/style/type/test) for a customer repo | `/setup-ci` | exists | `docs/customers/<slug>/client.json`, `git` remote, customer repo package manager signals | writes `.github/workflows/checks.yml` or `cloud-build/cloudbuild-checks.yaml` via `setup-ci-checks.ts`; the skill flow also prints secret bootstrap commands |
 | Bootstrap CI doc-sync for a client | `/setup-sync-ci` | exists | `docs/customers/<slug>/client.json` | prints CI snippet + secret commands (no file writes) |
 | Pick what to shape next | `/shape-next` | exists | external roadmap | none (hands off to `/shape`) |
 | Shape an issue | `/shape` | exists | external roadmap, conversation context | GitHub Issue body (creates/updates via `gh`); native issue type (via `set-issue-type.ts`); GitHub Project `Issue size (days)` and `Status=Shaped` |
