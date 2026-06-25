@@ -7,4 +7,4 @@ description: Placeholder for public repositories that reference the weekly team 
 
 # Weekly team check-in thread
 
-See `docs/templates/weekly-team-check-in-thread.md`.
+See `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/weekly-team-check-in-thread.md`.

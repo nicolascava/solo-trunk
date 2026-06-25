@@ -15,7 +15,7 @@ description: Flow metrics tracking and interpretation guide
 
 Flow metrics are the primary health signal for a Shaped Kanban system. They replace the cycle-level retrospective with a continuous, data-driven view of the pipeline's performance.
 
-Run `/flow-metrics` or `bun packages/scripts/src/flow-metrics.ts` each week to compute the current period's metrics.
+Run `/flow-metrics` each week to compute the current period's metrics.
 
 ## The four metrics
 
@@ -65,16 +65,9 @@ Only `Canceled` issues with a `Killed date` count toward kill rate. Pre-build ca
 
 ## How to run
 
-```bash
-# Current 4-week period
-bun packages/scripts/src/flow-metrics.ts
-
-# Custom date range
-bun packages/scripts/src/flow-metrics.ts --from 2026-04-01 --to 2026-04-30
-
-# JSON output for scripting
-bun packages/scripts/src/flow-metrics.ts --json
-```
+Use `/flow-metrics` for the current period. Include a date range in the request
+when the team needs a historical report, and ask for JSON output when another
+tool will consume the result.
 
 Output includes throughput, median lead time, appetite hit-rate, and kill rate for the period, plus a summary table of completed or killed issues.
 

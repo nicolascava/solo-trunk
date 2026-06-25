@@ -20,7 +20,7 @@ export GOOGLE_SERVICE_ACCOUNT_KEY_PATH=/tmp/google-sa.json
 
 # Compute changed files relevant to doc sync
 CHANGED=$(git diff --name-only "${BEFORE_SHA}" "${AFTER_SHA}" \
-  | grep -E '^docs/customers/.+/(roadmap\.csv|plans/.+\.md)$' \
+  | grep -E '^customer-docs/.+/(roadmap\.csv|plans/.+\.md)$' \
   | tr '\n' ',' | sed 's/,$//')
 
 if [ -z "$CHANGED" ]; then
@@ -31,5 +31,5 @@ fi
 echo "Changed files: $CHANGED"
 
 bun install --frozen-lockfile --ignore-scripts
-bun run packages/scripts/sync-customer-docs.ts \
+bun run sync-customer-docs \
   --changed-files "$CHANGED"

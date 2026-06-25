@@ -91,7 +91,7 @@ Enforced by `wip-check.ts` (reads the live GitHub Project board) and the `/start
 
 ## Flow metrics
 
-Track weekly via `/flow-metrics` or `bun packages/scripts/src/flow-metrics.ts`.
+Track weekly via `/flow-metrics`.
 
 | Metric | Description |
 |--------|-------------|

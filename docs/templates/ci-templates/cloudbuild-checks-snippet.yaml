@@ -62,7 +62,7 @@ steps:
       - |
         apt-get update -qq && apt-get install -y -q git > /dev/null 2>&1
         git fetch origin main --depth=1 2>/dev/null || true
-        bun packages/scripts/src/ci-change-scope.ts > /workspace/ci-scope.txt
+        bun run ci:scope > /workspace/ci-scope.txt  # SWAP: command that prints docs/content/terraform/full
         echo "CI scope: $(cat /workspace/ci-scope.txt)"
     waitFor: ["-"]
 
@@ -205,12 +205,11 @@ steps:
           .pnpm-store \
           .corepack \
           .turbo \
-          apps/web/.turbo \
-          apps/web/.eslintcache \
-          packages/mcp-cache/.turbo \
-          packages/personas/.turbo \
-          packages/scripts/.turbo \
-          packages/shared-roadmap/.turbo \
+          app/.turbo \
+          app/.eslintcache \
+          package-a/.turbo \
+          package-b/.turbo \
+          tooling/.turbo \
         ; do
           [ -e "$p" ] && paths="$paths $p"
         done

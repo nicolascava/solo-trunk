@@ -96,7 +96,7 @@ The roadmap CSV row is optionally appended (the `Issue` column stores the issue 
 
 ## Configuration
 
-> **Editing client.json:** edit `docs/customers/<slug>/client.json` directly and commit the change.
+> **Editing client.json:** edit the client's `client.json` directly and commit the change.
 
 Add an `intercomSync` block to the client's `client.json`:
 
@@ -139,14 +139,14 @@ The Intercom access token is stored in GCP Secret Manager as `intercom-access-to
 5. Install the app to the Intercom workspace.
 6. Add `workspaceId` and (optionally) `project` to the client's `client.json#intercomSync` block.
 
-The Canvas Kit server (`apps/intercom-canvas-kit/`) is a self-contained Bun HTTP service. Deploy it to any runtime that can serve HTTP and set the environment variables:
+The Canvas Kit server is a self-contained Bun HTTP service. Deploy it to any runtime that can serve HTTP and set the environment variables:
 - `INTERCOM_APP_CLIENT_SECRET:` from the Intercom Developer Hub (required).
 - `INTERCOM_ACCESS_TOKEN:` the workspace-level OAuth token (required).
 - `INTERCOM_ADMIN_ID:` the Intercom admin user ID to assign issues to (optional).
 - `GH_TOKEN:` a GitHub PAT for opening issues (required if `gh` CLI is not pre-authenticated).
 - `PORT:` optional, defaults to `8080`.
 
-For GCP: build the Dockerfile at `apps/intercom-canvas-kit/Dockerfile`, push to Artifact Registry, and deploy via Cloud Run with `min_instance_count = 0` and an LB URL (or direct service URL).
+For GCP: build the service Dockerfile, push to Artifact Registry, and deploy via Cloud Run with `min_instance_count = 0` and an LB URL (or direct service URL).
 
 ---
 
@@ -156,14 +156,14 @@ For GCP: build the Dockerfile at `apps/intercom-canvas-kit/Dockerfile`, push to 
 
 ```bash
 INTERCOM_ACCESS_TOKEN=<token> \
-bun run packages/scripts/src/intercom-sync.ts --client <slug> --dry-run
+bun run intercom-sync --client <slug> --dry-run
 ```
 
 Prints the conversations that would be promoted to GitHub issues. Mutates nothing.
 
 ### Canvas Kit in production
 
-The Canvas Kit server (`apps/intercom-canvas-kit/`) is a standalone Bun HTTP service that responds to Intercom button clicks in real time. It is not deployed as part of this monorepo's infra; each customer self-hosts it on their own GCP project (or any other runtime). See the setup steps above for environment variables and the Dockerfile.
+The Canvas Kit server is a standalone Bun HTTP service that responds to Intercom button clicks in real time. It is not deployed as part of this framework's infra; each customer self-hosts it on their own GCP project (or any other runtime). See the setup steps above for environment variables and the Dockerfile.
 
 ### Self-hosted backstop poller (optional)
 
@@ -173,12 +173,12 @@ The monorepo does not run a central backstop cron. Customers who want a server-s
 # Dry-run to preview what would be synced:
 INTERCOM_ACCESS_TOKEN=<token> \
 GH_TOKEN=<pat> \
-bun run packages/scripts/src/intercom-sync.ts --client <slug> --dry-run
+bun run intercom-sync --client <slug> --dry-run
 
 # Live run:
 INTERCOM_ACCESS_TOKEN=<token> \
 GH_TOKEN=<pat> \
-bun run packages/scripts/src/intercom-sync.ts --client <slug>
+bun run intercom-sync --client <slug>
 ```
 
 To automate it, create a Cloud Build trigger in your own GCP project that runs the script above, schedule it with Cloud Scheduler (daily is a safe default), and store `intercom-access-token` in your Secret Manager. See the setup steps in the Canvas Kit section for environment variable requirements.
@@ -196,7 +196,10 @@ The adapter contract is minimal:
 3. **Mark the conversation synced** (set an attribute or move it to a "synced" folder/status).
 4. **Add a back-link** (internal note or comment) in the conversation.
 
-To support a new platform, implement `IntercomClient` from `packages/scripts/src/intercom-to-github.ts` and swap the `intercom` argument in `intercom-sync.ts`. The orchestrator (`syncIntercomToGithub`) is platform-agnostic. The Canvas Kit service can be adapted by replacing `handleSubmit`'s Intercom-specific parsing with the new platform's webhook format.
+To support a new platform, implement the same customer-service client interface
+and wire it into the sync command. The orchestrator should stay
+platform-agnostic. The Canvas Kit service can be adapted by replacing the
+Intercom-specific parsing with the new platform's webhook format.
 
 ---
 

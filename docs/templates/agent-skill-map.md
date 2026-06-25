@@ -23,16 +23,16 @@ This document maps each Shaped Kanban phase to the Claude Code command that driv
 
 | Phase | Command | Status | Reads | Writes |
 |-------|-------|--------|-------|--------|
-| Bootstrap CI checks (lint/style/type/test) for a customer repo | `/setup-ci` | exists | `docs/customers/<slug>/client.json`, `git` remote, customer repo package manager signals | writes `.github/workflows/checks.yml` or `cloud-build/cloudbuild-checks.yaml` via `setup-ci-checks.ts`; the skill flow also prints secret bootstrap commands |
-| Bootstrap CI doc-sync for a client | `/setup-sync-ci` | exists | `docs/customers/<slug>/client.json` | prints CI snippet + secret commands (no file writes) |
+| Bootstrap CI checks (lint/style/type/test) for a customer repo | `/setup-ci` | exists | client config, `git` remote, customer repo package manager signals | writes the repository's CI workflow or build config; the skill flow also prints secret bootstrap commands |
+| Bootstrap CI doc-sync for a client | `/setup-sync-ci` | exists | client config | prints CI snippet + secret commands (no file writes) |
 | Pick what to shape next | `/shape-next` | exists | external roadmap | none (hands off to `/shape`) |
-| Shape an issue | `/shape` | exists | external roadmap, conversation context | GitHub Issue body (creates/updates via `gh`); native issue type (via `set-issue-type.ts`); GitHub Project `Issue size (days)` and `Status=Shaped` |
+| Shape an issue | `/shape` | exists | external roadmap, conversation context | GitHub Issue body (creates/updates via `gh`); native issue type; GitHub Project `Issue size (days)` and `Status=Shaped` |
 | Rank the roadmap | `/roadmap` | exists | external roadmap | external roadmap (reorders rows) |
 | Run the issue review table (required gate before Ready to work) | `/betting-table` | exists | GitHub Project board (Shaped issues) | GitHub Issue comment (issue gate sign-off with `Priority:` line recording P# / Rank); GitHub Project (moves chosen issues to Ready to work, sets board Rank field) |
 | Run the issue gate quality sign-off | (async GitHub Issue sign-off) | intentional gap; async process, not a skill | shaped GitHub Issues | human decision |
 | Start an issue in progress | `/start-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves issue to In progress, sets `Started date`) |
 | Bulk-import issues from external roadmap | `/import-issues` | exists | external roadmap rows | GitHub Issues (via `gh issue create`) |
-| Plan a week | `/weekly-plan` | exists | `docs/tasks.csv`, external roadmap, issues | weekly plan doc, client email (Default: Monday at 9:00 AM EST) |
+| Plan a week | `/weekly-plan` | exists | task inbox, external roadmap, issues | weekly plan doc, client email (Default: Monday at 9:00 AM EST) |
 | Generate stakeholder status update | `/status-update` | exists | `git` history, GitHub PRs, monorepo deliverables | client-ready status update doc (Default: Monday at 9:00 AM EST) |
 | Generate status update slides | `/status-slides` | exists | `git` history, GitHub PRs, monorepo deliverables | Slidev-compatible markdown presentation |
 | Post daily async update | `/daily-standup` (client-facing) · [daily-status-update-guide.md](daily-status-update-guide.md) (internal 3P) | exists | issues, scope Issues; `git` history for client variant | status comment on issue; 3P message posted in `#daily-status` |
@@ -41,7 +41,7 @@ This document maps each Shaped Kanban phase to the Claude Code command that driv
 | Ship or kill an issue | `/ship-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves to Shipped/Canceled), GitHub Issue (closed) |
 | Close an already-solved issue | `/close-solved-issue` | exists | GitHub Issue, GitHub Project | GitHub Project (moves to Shipped), GitHub Issue (closed) |
 | Compute flow metrics | `/flow-metrics` | exists | GitHub Issues (Shipped/Canceled via `gh`) | none (advisory output) |
-| Run retrospective | `/retro` | exists | `git` log, PR history | retrospective doc in `docs/retros/` |
+| Run retrospective | `/retro` | exists | `git` log, PR history | retrospective doc |
 | Triage stakeholder feedback | `/create-issue` | exists | scanner output, external roadmap, `client.json` | external roadmap (new row), GitHub Issues (native issue type via `set-issue-type.ts`), scanner reaction or triage note |
 | Classify a GitHub Issue for scheduling | `/triage` | exists | GitHub Issue, GitHub Project | GitHub Project (`Priority`, `Effort`, and `Impact` fields); GitHub Issue (native issue type via `set-issue-type.ts`) |
 

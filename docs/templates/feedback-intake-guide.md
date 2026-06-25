@@ -32,7 +32,7 @@ lives unresolved in a DM or scanner inbox for more than 24 hours.
 | Email | `export-apple-mail.ts`, `mailbox-discovery.js` | inbox |
 | Demo or live conversation | manual capture | meeting |
 
-Roadmap rows and shaped issue documents can also originate from external intake surfaces (Google Sheets, Notion DB, Excel, Google Docs, Notion pages, Word). These are imported using the per-platform adapter scripts (e.g., `packages/scripts/src/intake-from-gsheets.ts`) and do not require manual scanner triage. See [Multi-surface intake guide](multi-surface-intake-guide.md).
+Roadmap rows and shaped issue documents can also originate from external intake surfaces (Google Sheets, Notion DB, Excel, Google Docs, Notion pages, Word). These are imported using the per-platform adapters configured for the repository and do not require manual scanner triage. See [Multi-surface intake guide](multi-surface-intake-guide.md).
 
 Run the relevant scanner to surface unreplied items. Copy the source URL before triaging; it is written into the `Notes` column of any row or issue created so the item can be backtracked.
 
@@ -70,8 +70,8 @@ Run the canonical command for the disposition determined by the triage tree.
 
 | Disposition | Command |
 |-------------|---------|
-| Ops issue | Resolve `ISSUE_REPO` from `coordinationRepo`, falling back to `githubRepos[0]`; then run `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>` and set Severity on the project board with `gh project item-edit --id <board-item-id> --field-id <severity-field-id> --project-id <project-node-id> --single-select-option-id <SEVn-option-id>` (field IDs from `docs/templates/github-coordination-conventions.md`) |
-| Backlog row | Create the linked issue first with `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>`, then run `bun packages/scripts/src/add-issues-row.ts --file docs/customers/<client>/issues.csv --title "<title>" --type <type> --category <category> --slice <slice> --source <url> --issue "$ISSUE_URL"`, add the issue to the project board when configured, and record the issue URL in the row's `Issue` column |
+| Ops issue | Resolve `ISSUE_REPO` from `coordinationRepo`, falling back to `githubRepos[0]`; then run `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>` and set Severity on the project board with `gh project item-edit --id <board-item-id> --field-id <severity-field-id> --project-id <project-node-id> --single-select-option-id <SEVn-option-id>` (field IDs from `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/github-coordination-conventions.md`) |
+| Backlog row | Create the linked issue first with `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>`, then append a row to the external roadmap with the title, type, category, slice, source URL, and linked issue URL. Add the issue to the project board when configured, and record the issue URL in the row's `Issue` column |
 | Builder handoff | Do not create a row or issue; share the feedback with the current issue owner |
 | Note only | No row or issue; close with source triage marking |
 

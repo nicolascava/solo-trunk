@@ -29,25 +29,16 @@ These defaults are calibrated for an AI-native team where one human orchestrates
 
 ## Enforcement
 
-WIP limits are enforced by `packages/scripts/src/wip-check.ts`, which counts issues by Status on the live GitHub Project board:
+WIP limits are enforced by the repository's WIP check, which counts issues by
+Status on the live GitHub Project board. Run the check before starting new
+build, review, or shaping work.
 
-```bash
-# Check before starting a new In progress issue
-bun packages/scripts/src/wip-check.ts --stage build --client nca
+The `/start-issue` skill calls the WIP check automatically before advancing an
+issue to `In progress`. If the limit is reached, the check exits with code 1
+and prints the current WIP count.
 
-# Check before starting a new In review issue
-bun packages/scripts/src/wip-check.ts --stage review --client nca
-
-# Check before starting a new Being shaped issue
-bun packages/scripts/src/wip-check.ts --stage shape --client nca
-```
-
-The `/start-issue` skill calls `wip-check.ts` automatically before advancing an issue to `In progress`. If the limit is reached, the script exits with code 1 and prints the current WIP count.
-
-Custom limits:
-```bash
-bun packages/scripts/src/wip-check.ts --stage build --client nca --build-limit 4 --review-limit 3
-```
+Custom limits require an explicit team decision and should be documented on the
+issue or project board.
 
 ## When to override
 

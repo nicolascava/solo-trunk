@@ -160,7 +160,7 @@ jobs:
   # separate on.push trigger for main when using this job.
   #
   # SWAP: remove this job if the repo does not use the coverage-in-README practice.
-  # See docs/templates/testing-standards.md for setup instructions.
+  # See the testing standards guide for setup instructions.
   coverage-readme:
     name: Coverage README
     # SWAP: keep or remove depending on whether you want coverage on PRs
@@ -201,11 +201,11 @@ jobs:
           bun test \
             --coverage \
             --coverage-reporter=lcov \
-            --coverage-dir packages/scripts/coverage \
-            packages/scripts/src
+            --coverage-dir tooling/coverage \
+            tooling/src
 
       - name: Regenerate README coverage block
-        run: bun run packages/scripts/src/generate-coverage-readme.ts  # SWAP: path to generator
+        run: bun run coverage:readme  # SWAP: command that regenerates README coverage
 
       - name: Commit updated README if changed
         run: |

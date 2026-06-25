@@ -21,7 +21,7 @@ Step-by-step checklist for setting up Shaped Kanban in a new client GitHub repos
 
 - A GitHub repository with Issues, Projects, and Milestones enabled
 - `gh` CLI installed and authenticated for the client repository
-- Bun 1.x available (for the scripts in `packages/scripts/`)
+- Bun 1.x available for repository automation
 - This monorepo cloned locally for the CSV utility scripts
 - **Org issue types enabled.** The repository must be owned by a GitHub
   organization with the three default issue types enabled (Bug, Feature, Task).
@@ -43,29 +43,31 @@ Step-by-step checklist for setting up Shaped Kanban in a new client GitHub repos
 
 Accepted values for `roadmapSystem`: `"gsheets"`, `"notion"`, `"excel"`, `"jira"`.
 
-**GitHub Project.** Run the provisioning script to create and configure the project automatically:
-
-```bash
-bun run packages/scripts/src/provision-github-project.ts --client <slug> [--dry-run]
-```
-
-This creates a GitHub Project titled `Shaped Kanban` with the canonical pipeline columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`, `Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`), provisions the `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`, and `Rank` project fields, and imports any existing issues from `docs/customers/<slug>/issues.csv`. Run with `--dry-run` first to preview all actions. The script also prints the manual steps for the canonical Project views: `Contributors`, `Leadership`, `Roadmap`, and `All issues`.
+**GitHub Project.** Create and configure the project with the canonical pipeline
+columns (`Triage`, `Ready to be shaped`, `Being shaped`, `Shaped`,
+`Ready to work`, `In progress`, `In review`, `Merged`, `Shipped`, `Canceled`).
+Provision the `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`,
+and `Rank` project fields, then import any existing issues from the configured
+issue source. Add the canonical Project views: `Contributors`, `Leadership`,
+`Roadmap`, and `All issues`.
 
 **tasks.csv.** Create the following file in the client repository under `docs/` and commit it:
 
 ```
-docs/tasks.csv
+tasks.csv
 id,list,description,completed,completedAt,appetite,reminder,appleReminderId
 ```
 
-**Install issue template.** Run `bun run packages/scripts/src/pull-shaped-issue-template.ts` from this monorepo to regenerate `.github/ISSUE_TEMPLATE/shaped-issue.yml` from `docs/templates/shaped-issue-template.md`, then copy that file into the client repository. Commit it.
+**Install issue template.** Add a shaped issue form using the canonical
+shaped-issue structure, then commit it.
 
 ## Step 2: Mirror the canonical templates
 
-Create a `docs/customers/<client-name>/docs/` directory in this monorepo (or directly in the client repository). For each template in `docs/templates/`, create a thin instantiation file that opens with:
+Create a client docs directory in the client repository. For each template,
+create a thin instantiation file that opens with:
 
 ```markdown
-This is the <Client Name>-specific instantiation of [<template name>](../../templates/<file>.md). Read the template for the full rationale. This document records the <Client Name>-specific configuration.
+This is the <Client Name>-specific instantiation of [<template name>](https://github.com/nicolascava/solo-trunk/tree/main/templates<file>.md). Read the template for the full rationale. This document records the <Client Name>-specific configuration.
 ```
 
 Then add the client-specific details: participant names and roles, WIP limit overrides, OKR alignment criteria, and any process overrides.
@@ -118,7 +120,7 @@ Set up one or more external intake surfaces so non-technical shapers can submit 
      }
    }
    ```
-4. Run `bun run packages/scripts/src/intake-from-gsheets.ts --client <slug> --dry-run` (or the appropriate platform adapter) to validate the adapter configuration before enabling live imports.
+4. Run the appropriate platform adapter in dry-run mode to validate the adapter configuration before enabling live imports.
 
 ## Step 6: Shape the first issues
 
@@ -150,12 +152,12 @@ Run the kickoff session with the builder. See [In-flow workflow guide](in-flow-w
 ## Step 9: Verify before going live
 
 - [ ] All seven required public channels exist in the client's chat workspace
-- [ ] Both CSVs exist in `docs/` with correct header rows (`docs/tasks.csv`, `docs/deferred-findings.csv`)
-- [ ] `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`, and `Rank` project fields exist (run `bun run packages/scripts/src/provision-github-project.ts --dry-run` to verify)
+- [ ] Both CSVs exist with correct header rows (`tasks.csv`, `deferred-findings.csv`)
+- [ ] `Issue size (days)`, `Severity`, `Priority`, `Effort`, `Impact`, and `Rank` project fields exist
 - [ ] At least one issue is in Project `Status=Ready to work` or `Status=In progress`
 - [ ] A GitHub Project exists for tracking issues
 - [ ] Every relative link in the client instantiation docs resolves
-- [ ] `bun packages/scripts/src/wip-check.ts --stage build --client <slug>` exits 0 (no WIP violation)
+- [ ] The WIP check exits 0 for build-stage work (no WIP violation)
 
 ## Reference
 

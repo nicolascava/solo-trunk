@@ -17,8 +17,8 @@ placing `git-workflow.json` at the root with the following content:
 ```
 
 The PR-based workflow (the default for all repositories) is described in
-`docs/templates/in-flow-workflow-guide.md` and
-`docs/templates/github-coordination-conventions.md`. Use this guide only when
+`https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/in-flow-workflow-guide.md` and
+`https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/github-coordination-conventions.md`. Use this guide only when
 your repository declares `"workflow": "solo-trunk"`.
 
 ## Principles
@@ -33,7 +33,7 @@ your repository declares `"workflow": "solo-trunk"`.
    response.
 4. **Feature-flag discipline.** Ship incomplete features behind a flag rather
    than keeping long-lived branches. The circuit-breaker rule from
-   `docs/templates/circuit-breaker-rule.md` still applies: once the appetite is
+   `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/circuit-breaker-rule.md` still applies: once the appetite is
    exhausted, stop.
 5. **Same quality bar as the PR workflow.** The `/land` skill runs equivalent
    quality gates (build, tsc, lint, test), a `/pre-merge` self-review, and a
@@ -74,7 +74,7 @@ If any CI run on `main` fails after a push:
    30 minutes.
 3. Confirm the corrective run is green before resuming normal work.
 
-The 30-minute ceiling is borrowed from `docs/templates/in-flow-workflow-guide.md`.
+The 30-minute ceiling is borrowed from `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/in-flow-workflow-guide.md`.
 A red `main` is a production incident, not a normal working state.
 
 ## CI configuration
@@ -91,11 +91,11 @@ be configured as follows:
   replicates path-filter behaviour (since `workflow_run` does not support path
   filters natively).
 
-The nca monorepo (`checks.yml`, `deploy.yml`) is already configured this way.
+The reference implementation's checks and deploy workflows are configured this way.
 
 ## Opting in
 
 1. Add `git-workflow.json` to the repository root: `{ "workflow": "solo-trunk" }`
-2. Declare the opt-in in `AGENTS.md` under "Workflow rules" so agents honor it.
+2. Declare the opt-in in the repository's agent instructions under "Workflow rules" so agents honor it.
 3. Ensure the repository CI matches the configuration described above.
 4. Use `/land` instead of `/pr` + `/merge` to integrate completed work.

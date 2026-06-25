@@ -159,7 +159,7 @@ Same column schema as Google Sheets. The sheet must be named `Intake`. The `inta
 
 ## Document platform specs
 
-Each shaped issue document follows the canonical heading structure with these eight `Heading 2` sections in order when populated: **Problem**, **Appetite**, **Solution**, **Impacted repos**, **Rabbit holes**, **No-gos**, **Priority rationale**, **Sources**. Optional sections may be omitted when empty or non-applicable. An engineer can print the current body skeleton with `bun run packages/scripts/src/print-shaped-issue-body.ts`. The adapter rejects documents that are missing required sections or that specify an appetite outside the 1–5 business-day range.
+Each shaped issue document follows the canonical heading structure with these eight `Heading 2` sections in order when populated: **Problem**, **Appetite**, **Solution**, **Impacted repos**, **Rabbit holes**, **No-gos**, **Priority rationale**, **Sources**. Optional sections may be omitted when empty or non-applicable. Use `/shape` to produce the current body skeleton. The adapter rejects documents that are missing required sections or that specify an appetite outside the 1–5 business-day range.
 
 Use `Heading 1` for the issue title and `Heading 2` for each section heading. The H1 title is kebab-cased to produce the issue slug. The document must have exactly one H1.
 

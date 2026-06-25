@@ -68,7 +68,7 @@ Close out the thread by end of week with a brief summary of actions taken, or a 
 
 ## Adopting this in a client repo
 
-Create a thin instantiation file at `docs/customers/<slug>/docs/weekly-team-check-in.md` that opens with:
+Create a thin instantiation file in the client repository that opens with:
 
 ```markdown
 This is the <Client Name>-specific instantiation of [Weekly team check-in thread](../../templates/weekly-team-check-in-thread.md). Read the template for the full rationale. This document records the <Client Name>-specific configuration.
@@ -82,7 +82,8 @@ Then record only the client-specific details:
 - Cadence (default: weekly; override to bi-weekly if daily-status habit is strong)
 - Any custom greeting or opening line agreed with the team
 
-To diverge from the template content itself, fork into `docs/customers/<slug>/.canonical-overrides/templates/weekly-team-check-in-thread.md` and follow the canonical-override convention in `docs/templates/README.md`.
+To diverge from the template content itself, fork the template into the client
+repository and document the reason for the divergence near the top of the file.
 
 ## Anti-patterns
 

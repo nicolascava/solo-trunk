@@ -21,7 +21,7 @@ This document defines how GitHub resources map to Shaped Kanban concepts. Issues
 
 Install the issue template from `.github/ISSUE_TEMPLATE/` before the first shaped issue:
 
-- `shaped-issue.yml`: the shaped issue form; body structure defined by the canonical template at `docs/templates/shaped-issue-template.md` (regenerate with `bun run packages/scripts/src/pull-shaped-issue-template.ts`)
+- `shaped-issue.yml`: the shaped issue form; body structure follows the canonical shaped-issue template
 
 ## Issues
 
@@ -37,11 +37,7 @@ org-level issue types:
 | **Task**    | Maintenance, refactor, docs, or infrastructure work that is neither a capability nor a defect |
 
 The AI classifies the type from the issue content and sets it automatically
-during `/create-issue`, `/shape`, and `/triage` via:
-
-```bash
-bun run packages/scripts/src/set-issue-type.ts --ref <issue-url> --type <Bug|Feature|Task>
-```
+during `/create-issue`, `/shape`, and `/triage`.
 
 **Org requirement.** Native issue types are org-level resources. The repository
 must be owned by a GitHub organization that has the three default types (Bug,
@@ -93,18 +89,9 @@ An issue carrying either label floats to the **top of the queue** ahead of all P
 
 **Keep-set (never pruned):** `revenue-path`, `pilot-gate`, `risk:high`, `risk:low`. The `risk:high` / `risk:low` labels are owned by the per-repo PR risk-tagging workflow (`pr-risk-label.yml`, rendered into client repos by `render-pr-risk-protection.ts`) and must not be removed from the repo's label list.
 
-**Provision and prune** with:
-
-```bash
-# Always provisions revenue-path; prunes every other label not in the keep-set
-bun run packages/scripts/src/create-github-labels.ts --repo <owner/repo>
-
-# Also provisions pilot-gate (for active pilot projects)
-bun run packages/scripts/src/create-github-labels.ts --repo <owner/repo> --with-pilot-gate
-
-# Dry-run: print the gh commands without executing them
-bun run packages/scripts/src/create-github-labels.ts --repo <owner/repo> [--with-pilot-gate] --dry-run
-```
+Provision `revenue-path` in every repository. Provision `pilot-gate` for active
+pilot projects. Prune labels that are outside the keep-set only after reviewing
+the repository's current label usage.
 
 ## Projects
 
@@ -125,7 +112,7 @@ The provisioning script prints the manual steps for this view setup because GitH
 
 Existing projects with legacy Rejected or Killed Status options must be migrated manually before rerunning provisioning: move or rename those items into `Canceled`, then remove the legacy options. The scripts still read those legacy values as aliases during transition, but new canonical boards should only expose `Canceled`.
 
-Project fields provisioned by `bun run packages/scripts/src/provision-github-project.ts`:
+Project fields provisioned during setup:
 
 | Field        | Type          | Options                        | Purpose                                                                                                                        |
 | ------------ | ------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -142,7 +129,7 @@ Add all issues to the Project. The board is self-describing: every state dimensi
 
 ### WIP limits
 
-Three columns are WIP-limited; counts are read from the live board by `bun packages/scripts/src/wip-check.ts`:
+Three columns are WIP-limited; counts are read from the live board by the WIP check:
 
 | Column   | Limit | Rationale                                         |
 | -------- | ----- | ------------------------------------------------- |

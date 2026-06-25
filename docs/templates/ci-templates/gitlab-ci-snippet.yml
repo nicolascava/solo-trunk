@@ -1,5 +1,5 @@
 # GitLab CI snippet — add to .gitlab-ci.yml in the client repo.
-# Runs sync-customer-docs.ts when roadmap.csv or plans change on the default branch.
+# Runs the customer-doc sync command when roadmap.csv or plans change on the default branch.
 #
 # Required CI/CD variables (Settings → CI/CD → Variables, mark as Masked):
 #   NOTION_API_KEY
@@ -14,8 +14,8 @@ sync-customer-docs:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
-        - "docs/customers/**/roadmap.csv"
-        - "docs/customers/**/plans/**"
+        - "customer-docs/**/roadmap.csv"
+        - "customer-docs/**/plans/**"
   before_script:
     - bun install --frozen-lockfile --ignore-scripts
     - |
@@ -25,9 +25,9 @@ sync-customer-docs:
   script:
     - |
       CHANGED=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA \
-        | grep -E '^docs/customers/.+/(roadmap\.csv|plans/.+\.md)$' \
+        | grep -E '^customer-docs/.+/(roadmap\.csv|plans/.+\.md)$' \
         | tr '\n' ',' | sed 's/,$//')
-      bun run packages/scripts/sync-customer-docs.ts \
+      bun run sync-customer-docs \
         --changed-files "$CHANGED"
   variables:
     GIT_DEPTH: 2

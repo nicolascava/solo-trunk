@@ -12,24 +12,30 @@ description: Canonical doc CI sync pipeline guide
 - [`agent-skill-map.md`](agent-skill-map.md): skill matrix, including `/setup-sync-ci`
 - [`csv-state-store.md`](csv-state-store.md): CSV schema conventions
 - [`multi-surface-intake-guide.md`](multi-surface-intake-guide.md): inbound intake from external surfaces
-- [`.claude/skills/sync-docs/SKILL.md`](../../.claude/skills/sync-docs/SKILL.md): local (manual) sync command
 - [`ci-templates/`](ci-templates/): copy-paste CI snippets per provider
 
 ---
 
 ## Purpose
 
-When `docs/customers/<slug>/issues.csv` or `docs/customers/<slug>/plans/**.md` is updated on `main`, the changes are automatically mirrored to the client's destination platform:
+When a configured customer's `issues.csv` or plan Markdown files are updated on
+`main`, the changes are automatically mirrored to the client's destination
+platform:
 
 | Platform | Issues → | Plans → |
 |---|---|---|
-| Google | Google Sheets (`csv-to-gsheets.ts`) | Google Docs (`md-to-gdocs.ts`) |
-| Notion | Notion database (`csv-to-notion.ts`) | Notion pages (`md-to-notion.ts`) |
-| Microsoft/OneDrive | Excel workbook (`csv-to-onedrive.ts`) | PDF on OneDrive (`md-to-onedrive.ts`) |
+| Google | Google Sheets | Google Docs |
+| Notion | Notion database | Notion pages |
+| Microsoft/OneDrive | Excel workbook | PDF on OneDrive |
 
-The CI step runs `packages/scripts/src/sync-customer-docs.ts`, which routes by reading each client's `client.json`.
+The CI step routes by reading each client's `client.json`.
 
-The inverse direction (external surface → repo) is handled by the per-platform adapter scripts (e.g., `packages/scripts/src/intake-from-gsheets.ts`). Shapers draft roadmap rows in Google Sheets, Notion DB, or Excel, and pitch documents in Google Docs, Notion pages, or Word. Run the appropriate adapter script directly to import those drafts as PRs. See [Multi-surface intake guide](multi-surface-intake-guide.md) for the full contract.
+The inverse direction (external surface → repo) is handled by the per-platform
+adapter configured for the repository. Shapers draft roadmap rows in Google
+Sheets, Notion DB, or Excel, and pitch documents in Google Docs, Notion pages,
+or Word. Run the appropriate adapter to import those drafts as PRs. See
+[Multi-surface intake guide](multi-surface-intake-guide.md) for the full
+contract.
 
 ---
 
@@ -53,14 +59,15 @@ Microsoft wins over Google when both are configured (e.g., a client with both On
 | Condition | Description |
 |---|---|
 | Branch | `main` only |
-| Paths | `docs/customers/**/issues.csv` OR `docs/customers/**/plans/**` |
+| Paths | configured customer `issues.csv` or plan Markdown files |
 | Sensitive | Slugs with `roadmapSensitiveSource` set are **skipped**; sync must be triggered from the sensitive-repo CI |
 
 ---
 
 ## Client metadata authoring
 
-`docs/customers/<slug>/client.json` is the **source of truth** read by all sync scripts. Edit it directly and commit the change.
+`client.json` is the **source of truth** read by all sync scripts. Edit it
+directly and commit the change.
 
 ---
 
@@ -110,13 +117,12 @@ All secrets live in GCP Secret Manager (Cloud Build) or GitHub/GitLab/Bitbucket 
 
 The `MICROSOFT_OAUTH_REFRESH_TOKEN` requires a one-time interactive sign-in to obtain:
 
-```sh
-# Run locally, sign in when the browser opens
-bun run packages/scripts/src/microsoft-auth.ts --get-refresh-token
-# Copy the printed token and store it in Secret Manager / repo secrets
-```
+Run the repository's Microsoft auth bootstrap locally, sign in when the browser
+opens, then copy the printed token and store it in Secret Manager or repo
+secrets.
 
-The CI non-interactive path in `microsoft-auth.ts`: if `MICROSOFT_OAUTH_REFRESH_TOKEN` is set, `getGraphAccessToken()` exchanges it directly via the `/oauth2/v2.0/token` endpoint and skips the browser flow entirely.
+The CI non-interactive path exchanges `MICROSOFT_OAUTH_REFRESH_TOKEN` directly
+via the `/oauth2/v2.0/token` endpoint and skips the browser flow entirely.
 
 ---
 
@@ -124,9 +130,9 @@ The CI non-interactive path in `microsoft-auth.ts`: if `MICROSOFT_OAUTH_REFRESH_
 
 | Action | Command |
 |---|---|
-| Sync all changed clients (CI mode) | `bun run packages/scripts/src/sync-customer-docs.ts --changed-files <csv-list>` |
-| Sync a single client (dry-run) | `bun run packages/scripts/src/sync-customer-docs.ts --client lua --dry-run` |
-| Sync roadmap only | `bun run packages/scripts/src/sync-customer-docs.ts --client fix --only roadmap` |
+| Sync all changed clients (CI mode) | repository doc-sync CI |
+| Sync a single client (dry-run) | `/sync-docs <client> --dry-run` |
+| Sync roadmap only | `/sync-docs <client> --only roadmap` |
 | Bootstrap CI for a new client | `/setup-sync-ci` |
 | Local manual sync (developer) | `/sync-docs` |
 
@@ -138,7 +144,7 @@ The CI non-interactive path in `microsoft-auth.ts`: if `MICROSOFT_OAUTH_REFRESH_
 - The CI step exits non-zero if any individual sync fails, so Cloud Build/GitHub Actions marks the run as failed and notifies the team.
 - Each client's failure is isolated: if `lua` sync fails, `fix` and `bgp` still run.
 - `GOOGLE_SA_KEY` must be base64-encoded in CI. The build step decodes it before use: `printf '%s' "$GOOGLE_SA_KEY" | base64 -d > /workspace/google-sa.json`.
-- Do not add `docs/issues.csv` (internal monorepo roadmap) as a trigger path; it is explicitly excluded from syncing.
+- Do not add the internal roadmap CSV as a trigger path; it is explicitly excluded from syncing.
 
 ---
 
@@ -147,5 +153,4 @@ The CI non-interactive path in `microsoft-auth.ts`: if `MICROSOFT_OAUTH_REFRESH_
 - [`agent-skill-map.md`](agent-skill-map.md): skill matrix, including `/setup-sync-ci`
 - [`csv-state-store.md`](csv-state-store.md): CSV schema conventions
 - [`multi-surface-intake-guide.md`](multi-surface-intake-guide.md): inbound intake from external surfaces
-- [`.claude/skills/sync-docs/SKILL.md`](../../.claude/skills/sync-docs/SKILL.md): local (manual) sync command
 - [`ci-templates/`](ci-templates/): copy-paste CI snippets per provider

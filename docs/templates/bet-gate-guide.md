@@ -83,13 +83,11 @@ Before signing off, the decider evaluates:
 
 ## Issue format (shaped body)
 
-The GitHub Issue body follows the canonical shaped-issue template. Print the current body skeleton:
+The GitHub Issue body follows the canonical shaped-issue template. Use `/shape`
+to replace a pre-shaped issue with the full shaped body.
 
-```bash
-bun run packages/scripts/src/print-shaped-issue-body.ts
-```
-
-The template source of truth is `docs/templates/shaped-issue-template.md`. The GitHub new-issue form is at `.github/ISSUE_TEMPLATE/shaped-issue.yml`; regenerate it with `bun run packages/scripts/src/pull-shaped-issue-template.ts`.
+The GitHub new-issue form should follow the same canonical shaped-issue
+structure.
 
 ## Deferred issues
 
