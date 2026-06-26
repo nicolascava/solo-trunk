@@ -21,7 +21,7 @@ This document defines the canonical process, document layout, CSV schemas, filin
 Per-client SR&ED data may include business numbers, salaries, employee names, and claim
 evidence. Store those artifacts in the client-approved claim repository for the engagement.
 For this monorepo, `docs/customers/<slug>/sred/<fiscal-year>/` is an approved location when the
-client's `client.json` does not declare a separate `sensitiveRepo.root`.
+client's `client.json.sred.publicClaimArtifactsApproved` is `true`.
 
 ## Jurisdictions
 
@@ -30,7 +30,7 @@ client's `client.json` does not declare a separate `sensitiveRepo.root`.
 | Federal (CRA) | T661 | Canada Revenue Agency | 18 months after fiscal year end |
 | Quebec (RQ) | RD-1029.7 | Revenu Québec | 12 months after fiscal year end |
 
-The `/sred` skill targets both by default. A client may be federal-only if they have no Quebec establishment. Set `jurisdictions` in `client.json` to `["cra"]` to skip RQ.
+The `/sred` skill targets both by default. A client may be federal-only if they have no Quebec establishment. Set `client.json.sred.jurisdictions` to `["cra"]` to skip RQ.
 
 ## Folder layout
 
@@ -53,7 +53,7 @@ For this monorepo, use the `/sred` skill. If `client.json` declares a separate
 
 ### `projects.csv`
 
-One row per SR&ED project for the fiscal year. Written by `packages/scripts/append-sred-project.ts`.
+One row per SR&ED project for the fiscal year. Written by the SR&ED project append command.
 
 | Column | Type | Description |
 |---|---|---|
@@ -69,7 +69,7 @@ One row per SR&ED project for the fiscal year. Written by `packages/scripts/appe
 
 ### `personnel.csv`
 
-One row per (project, employee) allocation. Written by `packages/scripts/append-sred-personnel.ts`.
+One row per (project, employee) allocation. Written by the SR&ED personnel append command.
 
 | Column | Type | Description |
 |---|---|---|
@@ -85,7 +85,7 @@ One row per (project, employee) allocation. Written by `packages/scripts/append-
 
 ### `evidence.csv`
 
-One row per linked artifact. Written by `packages/scripts/append-sred-evidence.ts`. Seeded from `git` history by `packages/scripts/aggregate-sred-evidence.ts`.
+One row per linked artifact. Written by the SR&ED evidence append command. Seeded from `git` history by the SR&ED evidence aggregation command.
 
 | Column | Type | Description |
 |---|---|---|
@@ -130,7 +130,7 @@ Evidence documents that SR&ED work happened during the claim period. More is bet
 
 | Kind | Good evidence | Notes |
 |---|---|---|
-| `commit` | Git commits with descriptive messages | Mined automatically by `aggregate-sred-evidence.ts` |
+| `commit` | Git commits with descriptive messages | Mined automatically by the SR&ED evidence aggregation command |
 | `pull_request` | PRs that describe a hypothesis, test, or finding | Link to the PR; include description |
 | `issue` | GitHub Issues that frame a technical problem or shaped design | Include title and URL |
 | `doc` | Architecture decisions, ADRs, design docs | Include filename or URL |
