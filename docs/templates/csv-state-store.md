@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-csv-state-store
-canonical-version: 2026-06-23
+canonical-version: 2026-06-26
 description: CSV as lightweight state store for tasks, issue mirrors, and SR&ED
 ---
 
@@ -14,7 +14,7 @@ description: CSV as lightweight state store for tasks, issue mirrors, and SR&ED
 
 ## Purpose
 
-Pipeline state (issues, scopes, appetite) lives in GitHub Issues and the GitHub Project board, not in hand-edited CSV files. CSV files remain in use for three specific purposes: the lightweight operational task inbox (`tasks.csv`), generated GitHub Project issue mirrors (`issues.csv`) for teams whose configuration declares `"issuesSourceOfTruth": "github-issues"`, and sensitive SR&ED artifacts stored in the per-client sensitive repository.
+Pipeline state (issues, scopes, appetite) lives in GitHub Issues and the GitHub Project board, not in hand-edited CSV files. CSV files remain in use for three specific purposes: the lightweight operational task inbox (`tasks.csv`), generated GitHub Project issue mirrors (`issues.csv`) for teams whose configuration declares `"issuesSourceOfTruth": "github-issues"`, and client-approved SR&ED claim artifacts.
 
 This document defines those CSVs: column schemas, the scripts that read and write them, and the rules for hand-editing.
 
@@ -121,11 +121,14 @@ assignee, label, appetite, and due-date changes in GitHub. Local notes and plan
 links may be edited in the CSV when needed, but only on rows that already have a
 GitHub issue URL.
 
-## SR&ED CSVs (per-client, sensitive)
+## SR&ED CSVs
 
-SR&ED artifacts contain sensitive data (employee names, salaries, business numbers) and are stored in the per-client sensitive repository, not the public monorepo. The canonical schemas are defined in `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/sred-tracking.md`.
+SR&ED artifacts can contain employee names, salaries, business numbers, and claim evidence.
+Store them in the client-approved claim repository. In this monorepo,
+`docs/customers/<slug>/sred/<fiscal-year>/` is approved unless `client.json` declares a
+separate `sensitiveRepo.root`.
 
-Location: `<sensitive-repo-root>/customers/<slug>/sred/<fiscal-year>/`
+Location: `<claim-root>/customers/<slug>/sred/<fiscal-year>/`
 
 | File | Purpose |
 |------|---------|
@@ -133,8 +136,7 @@ Location: `<sensitive-repo-root>/customers/<slug>/sred/<fiscal-year>/`
 | `personnel.csv` | One row per (project, employee) allocation. Columns: `id`, `project_slug`, `person_name`, `role`, `province`, `allocation_pct`, `salary_cad`, `is_subcontractor`, `notes` |
 | `evidence.csv` | One row per linked artifact (commit, PR, issue, etc.). Columns: `id`, `project_slug`, `kind`, `ref`, `title`, `occurred_at`, `notes` |
 
-Always write SR&ED CSVs in the sensitive repository for the relevant client and
-fiscal year.
+Always write SR&ED CSVs in the approved claim location for the relevant client and fiscal year.
 
 See [SR&ED tracking](sred-tracking.md) for filing calendar, eligibility checklist, and evidence rules.
 

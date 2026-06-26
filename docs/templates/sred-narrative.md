@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-sred-narrative
-canonical-version: 2026-05-07
+canonical-version: 2026-06-26
 description: SR&ED project narrative template
 ---
 
@@ -9,7 +9,7 @@ description: SR&ED project narrative template
 
 # SR&ED project narrative: [project-slug]
 
-> Copy this template to `<sensitive-repo>/customers/<slug>/sred/<fiscal-year>/projects/<project-slug>.md`.
+> Copy this template to `<claim-root>/customers/<slug>/sred/<fiscal-year>/projects/<project-slug>.md`.
 > Fill in every section. Remove instructional lines (starting with `>`).
 > Change the lang marker to `<!-- lang: fr -->` and translate all headings and content for French-language clients.
 
@@ -74,7 +74,7 @@ description: SR&ED project narrative template
 
 # Narrative du projet RS&DE : [project-slug]
 
-> Copiez ce modèle dans `<dépôt-sensible>/customers/<slug>/sred/<année-fiscale>/projects/<project-slug>.md`.
+> Copiez ce modèle dans `<racine-réclamation>/customers/<slug>/sred/<année-fiscale>/projects/<project-slug>.md`.
 > Remplissez chaque section. Supprimez les lignes d'instruction (commençant par `>`).
 
 ## Informations du projet

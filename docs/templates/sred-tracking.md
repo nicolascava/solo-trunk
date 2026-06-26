@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-sred-tracking
-canonical-version: 2026-05-07
+canonical-version: 2026-06-26
 description: SR&ED time and activity tracking template
 ---
 
@@ -18,7 +18,10 @@ SR&ED (Scientific Research and Experimental Development) is a Canadian federal t
 
 This document defines the canonical process, document layout, CSV schemas, filing calendar, and evidence rules for preparing and submitting an SR&ED/RS&DE claim. It is the reference for the `/sred` skill and for any agent or human touching SR&ED artifacts.
 
-All per-client data (business numbers, salaries, employee names) is sensitive and lives in the per-client sensitive repository. Only the template and skill live in the public monorepo.
+Per-client SR&ED data may include business numbers, salaries, employee names, and claim
+evidence. Store those artifacts in the client-approved claim repository for the engagement.
+For this monorepo, `docs/customers/<slug>/sred/<fiscal-year>/` is an approved location when the
+client's `client.json` does not declare a separate `sensitiveRepo.root`.
 
 ## Jurisdictions
 
@@ -29,10 +32,10 @@ All per-client data (business numbers, salaries, employee names) is sensitive an
 
 The `/sred` skill targets both by default. A client may be federal-only if they have no Quebec establishment. Set `jurisdictions` in `client.json` to `["cra"]` to skip RQ.
 
-## Folder layout (per-client, sensitive repo)
+## Folder layout
 
 ```
-<sensitive-repo-root>/customers/<slug>/sred/<fiscal-year>/
+<claim-root>/customers/<slug>/sred/<fiscal-year>/
   projects.csv              # one row per SR&ED project
   personnel.csv             # one row per (project, employee) allocation
   evidence.csv              # one row per linked artifact
@@ -40,7 +43,11 @@ The `/sred` skill targets both by default. A client may be federal-only if they 
   README.md                 # filing checklist for the fiscal year
 ```
 
-Bootstrap with: `bun packages/scripts/bootstrap-sred-claim.ts --client <slug> --fiscal-year <YYYY> --sensitive-root <path>`
+Bootstrap this layout with your repository's SR&ED claim setup command, or create the folder
+and CSV files manually from the schemas below.
+
+For this monorepo, use the `/sred` skill. If `client.json` declares a separate
+`sensitiveRepo.root`, use that repository root instead.
 
 ## CSV schemas
 
@@ -134,7 +141,7 @@ Rules:
 - Evidence must fall within the project's `project_start_date` and `project_end_date`.
 - Each `project_slug` in `evidence.csv` must match a row in `projects.csv`.
 - At minimum, have evidence from at least two different `kind` values per project.
-- Keep raw evidence (commit logs, test reports) accessible in the repo or the sensitive repo for CRA review.
+- Keep raw evidence (commit logs, test reports) accessible in the claim repository for CRA review.
 
 ## Anti-patterns
 
