@@ -20,8 +20,9 @@ This document defines the canonical process, document layout, CSV schemas, filin
 
 Per-client SR&ED data may include business numbers, salaries, employee names, and claim
 evidence. Store those artifacts in the client-approved claim repository for the engagement.
-For this monorepo, `docs/customers/<slug>/sred/<fiscal-year>/` is an approved location when the
-client's `client.json.sred.publicClaimArtifactsApproved` is `true`.
+Public monorepos are disallowed for claim artifacts unless the repository root contains
+`sensitive-root.json` with `{ "mode": "self" }`. For this monorepo, that self-sensitive marker
+approves `docs/customers/<slug>/sred/<fiscal-year>/` as the claim location.
 
 ## Jurisdictions
 
@@ -47,7 +48,9 @@ Bootstrap this layout with your repository's SR&ED claim setup command, or creat
 and CSV files manually from the schemas below.
 
 For this monorepo, use the `/sred` skill. If `client.json` declares a separate
-`sensitiveRepo.root`, use that repository root instead.
+`sensitiveRepo.root`, use that repository root instead. Separate sensitive repos use
+`<claim-root>/customers/<slug>/sred/<fiscal-year>/`; self-sensitive mode uses `docs/` as the
+claim root.
 
 ## CSV schemas
 

@@ -124,9 +124,11 @@ GitHub issue URL.
 ## SR&ED CSVs
 
 SR&ED artifacts can contain employee names, salaries, business numbers, and claim evidence.
-Store them in the client-approved claim repository. In this monorepo,
-`docs/customers/<slug>/sred/<fiscal-year>/` is approved unless `client.json` declares a
-separate `sensitiveRepo.root`.
+Store them in the client-approved claim repository. Public monorepos are disallowed unless the
+repository root is explicitly marked self-sensitive with `sensitive-root.json` containing
+`{ "mode": "self" }`. In this monorepo, that marker approves
+`docs/customers/<slug>/sred/<fiscal-year>/` unless `client.json` declares a separate
+`sensitiveRepo.root`.
 
 Location: `<claim-root>/customers/<slug>/sred/<fiscal-year>/`
 
