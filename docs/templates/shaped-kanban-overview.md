@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-shaped-kanban-overview
-canonical-version: 2026-06-24
+canonical-version: 2026-06-30
 description: One-page Shaped Kanban framework reference
 ---
 
@@ -141,7 +141,7 @@ See [Flow metrics guide](flow-metrics-guide.md).
 All work-relevant messages live in public channels. DMs are reserved for sensitive content only (compensation, performance, legal, security pre-disclosure). See [Communication channels guide](communication-channels-guide.md) for the required channel list and channel-by-message-type routing matrix. The weekly stakeholder status update defaults to **Monday at 9:00 AM EST**.
 
 Every piece of stakeholder or customer feedback is triaged within 24 hours:
-classified, persisted as an ops issue, backlog row, builder handoff, or note,
+classified, persisted as an ops issue, backlog row, existing tracked item, or note,
 and closed with source triage marking. See [Feedback intake guide](feedback-intake-guide.md)
 for the triage decision tree and persistence commands. Use `/create-issue` to
 run the full triage loop end to end.

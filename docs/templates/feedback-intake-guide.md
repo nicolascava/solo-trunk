@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-feedback-intake-guide
-canonical-version: 2026-06-22
+canonical-version: 2026-06-30
 description: Structured feedback intake guide
 ---
 
@@ -17,8 +17,10 @@ description: Structured feedback intake guide
 ## Purpose
 
 Every piece of feedback lands as exactly one of: an ops issue, a backlog row,
-a builder handoff, or a noted triage item. Nothing falls through. Nothing
-lives unresolved in a DM or scanner inbox for more than 24 hours.
+an existing tracked item, or a verified note (non-actionable, duplicate already
+tracked, or already shipped with evidence). Nothing actionable falls through
+untracked. Nothing lives unresolved in a DM or scanner inbox for more than 24
+hours.
 
 ## Sources
 
@@ -51,9 +53,11 @@ Is something broken in production?
                 → create linked pre-shaped issue via /create-issue
                 → suggest /shape when ready to replace the body with the full shaped template
 
-          no  → Is it a tweak to an issue already in progress?
-                  yes → owner of current issue addresses it before shipping
-                        (per in-flow workflow guide "What to do when things go sideways")
+          no  → Is it a tweak to current in-progress work?
+                  yes → does an exact tracked issue or PR already cover this feedback?
+                          yes → existing tracked item: add a gh issue comment
+                          no  → standard backlog row
+                                → create linked pre-shaped issue via /create-issue
 
                 no  → Is it a small backlog item (under ~30 minutes)?
                         yes → standard backlog row
@@ -72,8 +76,8 @@ Run the canonical command for the disposition determined by the triage tree.
 |-------------|---------|
 | Ops issue | Resolve `ISSUE_REPO` from `coordinationRepo`, falling back to `githubRepos[0]`; then run `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>` and set Severity on the project board with `gh project item-edit --id <board-item-id> --field-id <severity-field-id> --project-id <project-node-id> --single-select-option-id <SEVn-option-id>` (field IDs from `https://github.com/nicolascava/solo-trunk/blob/main/docs/templates/github-coordination-conventions.md`) |
 | Backlog row | Create the linked issue first with `gh issue create --repo "$ISSUE_REPO" --title "<title>" --body-file <body-file>`, then append a row to the external roadmap with the title, type, category, slice, source URL, and linked issue URL. Add the issue to the project board when configured, and record the issue URL in the row's `Issue` column |
-| Builder handoff | Do not create a row or issue; share the feedback with the current issue owner |
-| Note only | No row or issue; close with source triage marking |
+| Existing tracked item | Add a `gh issue comment` to the existing tracked issue and record its URL; if no exact tracked item exists, create a backlog row instead |
+| Note only | Non-actionable, duplicate already tracked, or verified already-shipped (cite the evidence URL); no row or issue |
 
 The `--source <url>` flag writes `source:<url>` into the `Notes` field of the new external roadmap row. This lets `/create-issue` backtrack the item to its origin when following up later.
 
@@ -89,7 +93,7 @@ reaction path close through the command audit note.
 |-------------|------------------|
 | Ops issue | `✅` scanner reaction for Slack message permalinks or Discord message URLs; otherwise noted as triaged |
 | Backlog row | `✅` scanner reaction for Slack message permalinks or Discord message URLs; otherwise noted as triaged |
-| Builder handoff | `✅` scanner reaction for Slack message permalinks or Discord message URLs; otherwise noted as triaged |
+| Existing tracked item | `✅` scanner reaction for Slack message permalinks or Discord message URLs; otherwise noted as triaged |
 | Note only | `✅` scanner reaction for Slack message permalinks or Discord message URLs; otherwise noted as triaged |
 
 Slack message permalinks and Discord message URLs are closed by adding a `✅`
@@ -108,7 +112,7 @@ path; note them as triaged in the command audit output.
 
 **One item, one disposition.** Do not file the same feedback as both a backlog row and an ops issue. Pick the correct track based on the triage tree.
 
-**No mid-issue scope from feedback.** A stakeholder asking for something during an active `In progress` issue is not a mid-issue scope addition. If it is structural, add a backlog row to the external roadmap. If it is a tweak to the current issue, the builder addresses it before shipping. Never expand the issue in flight.
+**No mid-issue scope from feedback.** A stakeholder asking for something during an active `In progress` issue is not a mid-issue scope addition. If it is structural, add a backlog row to the external roadmap. If it is a tweak to the current issue, attach it to the existing tracked issue or add a backlog row. Never drop it. Never expand the issue in flight.
 
 **No ops issues for structural improvements.** The ops track is reactive. A feature request or improvement belongs in the external roadmap as `Backlog`, not in the ops GitHub issue backlog.
 
