@@ -1,7 +1,7 @@
 ---
 canonical: true
 canonical-id: template-multi-surface-intake-guide
-canonical-version: 2026-05-30
+canonical-version: 2026-06-30
 description: Multi-surface intake guide for non-technical shapers
 ---
 
@@ -159,7 +159,7 @@ Same column schema as Google Sheets. The sheet must be named `Intake`. The `inta
 
 ## Document platform specs
 
-Each shaped issue document follows the canonical heading structure with these eight `Heading 2` sections in order when populated: **Problem**, **Appetite**, **Solution**, **Impacted repos**, **Rabbit holes**, **No-gos**, **Priority rationale**, **Sources**. Optional sections may be omitted when empty or non-applicable. Use `/shape` to produce the current body skeleton. The adapter rejects documents that are missing required sections or that specify an appetite outside the 1–5 business-day range.
+Each shaped issue document follows the canonical heading structure with these nine `Heading 2` sections in order when populated: **Problem**, **Steps to reproduce** (Bug issues only, immediately after Problem), **Issue size**, **Solution**, **Impacted repos**, **Rabbit holes**, **No-gos**, **Priority rationale**, **Sources**. Optional sections may be omitted when empty or non-applicable. Use `/shape` to produce the current body skeleton. The adapter rejects documents that are missing required sections or that specify an issue size outside the 1–5 business-day range.
 
 Use `Heading 1` for the issue title and `Heading 2` for each section heading. The H1 title is kebab-cased to produce the issue slug. The document must have exactly one H1.
 
